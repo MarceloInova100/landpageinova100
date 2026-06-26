@@ -112,7 +112,7 @@
         .btn-whatsapp-fixed {
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            right: 180px; /* Ajustado para dar espaço ao chat de IA */
             background-color: #25d366;
             color: #fff;
             border-radius: 50px;
@@ -141,15 +141,140 @@
 
         /* Animação suave para chamar atenção */
         @keyframes pulse-whatsapp {
-            0% {
-                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        /* --- WIDGET DE ATENDIMENTO IA --- */
+        .ai-chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            font-family: sans-serif;
+        }
+
+        .ai-chat-btn {
+            background-color: var(--amarelo);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .ai-chat-btn:hover {
+            background-color: #ffdb4d;
+            transform: scale(1.03);
+        }
+
+        .ai-chat-box {
+            display: none;
+            width: 320px;
+            height: 400px;
+            background: #151515;
+            border: 2px solid var(--amarelo);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            flex-direction: column;
+            overflow: hidden;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+        }
+
+        .ai-chat-header {
+            background: #000;
+            padding: 12px;
+            border-bottom: 2px solid var(--amarelo);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-chat-header h6 {
+            margin: 0;
+            color: var(--amarelo);
+            font-weight: bold;
+        }
+
+        .ai-chat-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .msg {
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .msg.bot {
+            background: #222;
+            color: #fff;
+            align-self: flex-start;
+            border-left: 3px solid var(--amarelo);
+        }
+
+        .msg.user {
+            background: var(--amarelo);
+            color: #000;
+            align-self: flex-end;
+            font-weight: 500;
+        }
+
+        .ai-chat-input-area {
+            padding: 10px;
+            background: #000;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #333;
+        }
+
+        .ai-chat-input-area input {
+            flex: 1;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .ai-chat-input-area input:focus {
+            outline: none;
+            border-color: var(--amarelo);
+        }
+
+        .ai-chat-send {
+            background: var(--amarelo);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
         }
  
     </style>
@@ -396,11 +521,89 @@
  
 </footer>
 
+<!-- --- BOTÃO FIXO DO WHATSAPP --- -->
 <a href="https://wa.me/554330395145?text=Olá,%20gostaria%20de%20solicitar%20um%20orçamento%20de%20sementes/fertilizantes." class="btn-whatsapp-fixed" target="_blank" rel="noopener noreferrer">
     <i class="bi bi-whatsapp"></i> Fale Conosco
 </a>
 
+<!-- --- CONTAINER DA IA DE ATENDIMENTO --- -->
+<div class="ai-chat-container">
+    <button class="ai-chat-btn" onclick="toggleChat()">
+        <i class="bi bi-robot"></i> Chat IA
+    </button>
+    
+    <div class="ai-chat-box" id="aiChatBox">
+        <div class="ai-chat-header">
+            <h6><i class="bi bi-robot"></i> Assistente INOVA</h6>
+            <button class="ai-chat-close" onclick="toggleChat()">&times;</button>
+        </div>
+        <div class="ai-chat-messages" id="chatMessages">
+            <div class="msg bot">
+                Olá! Sou a Inteligência Artificial da INOVA 100. 🌱 Como posso te ajudar hoje? Você pode perguntar sobre nossos produtos (Soja, Milho, Fertilizantes) ou como solicitar um orçamento!
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="userInput" placeholder="Digite sua mensagem..." onkeydown="if(event.key === 'Enter') sendAIMessage()">
+            <button class="ai-chat-send" onclick="sendAIMessage()"><i class="bi bi-send"></i></button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- --- LOGICA DO ATENDIMENTO IA --- -->
+<script>
+    function toggleChat() {
+        const chatBox = document.getElementById('aiChatBox');
+        if(chatBox.style.display === 'flex') {
+            chatBox.style.display = 'none';
+        } else {
+            chatBox.style.display = 'flex';
+            // Scroll automático para o final quando abre
+            const msgs = document.getElementById('chatMessages');
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+    }
+
+    function sendAIMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if(!text) return;
+
+        // Adiciona mensagem do usuário
+        appendMessage(text, 'user');
+        input.value = '';
+
+        // Resposta simulada da IA baseada em palavras-chave
+        setTimeout(() => {
+            let response = "Desculpe, não entendi perfeitamente. Você gostaria de falar sobre as nossas sementes de Soja, Milho, Fertilizantes, ou prefere solicitar um orçamento direto no nosso formulário abaixo?";
+            const upperText = text.toLowerCase();
+
+            if(upperText.includes('soja')) {
+                response = "Trabalhamos com cultivares de soja de altíssima qualidade, excelente vigor e potencial produtivo ideal para a nossa região. Deseja fazer uma cotação para a sua área?";
+            } else if(upperText.includes('milho')) {
+                response = "Nossos híbridos de milho trazem tecnologia de ponta para garantir estabilidade e máximo rendimento na sua safrinha ou safra de verão!";
+            } else if(upperText.includes('fertilizante') || upperText.includes('adubo')) {
+                response = "Temos uma linha completa de fertilizantes com nutrição balanceada para corrigir seu solo e elevar o patamar da sua colheita.";
+            } else if(upperText.includes('orçamento') || upperText.includes('preço') || upperText.includes('cotar') || upperText.includes('comprar')) {
+                response = "Perfeito! Você pode preencher o formulário de 'Fale Conosco' logo atrás desta janela ou clicar no botão verde do WhatsApp para falar diretamente com um consultor técnico!";
+            } else if(upperText.includes('olá') || upperText.includes('oi') || upperText.includes('bom dia')) {
+                response = "Olá! Seja muito bem-vindo à INOVA 100. Em que posso te ajudar hoje no manejo da sua lavoura?";
+            }
+
+            appendMessage(response, 'bot');
+        }, 600);
+    }
+
+    function appendMessage(text, sender) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('msg', sender);
+        msgDiv.innerText = text;
+        messagesContainer.appendChild(msgDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+</script>
  
 </body>
 </html>
